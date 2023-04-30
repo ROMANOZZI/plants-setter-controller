@@ -8,8 +8,7 @@ int RELAY1 =5;  // num of pin
 int RELAY2 =4;
 int RELAY3 =14;
 int RELAY4 =12;
-boolean state = false;
-int count=0; 
+
 
   int valueM= 0, moisture=0;
 
@@ -23,6 +22,7 @@ FirebaseJson json;
 #define SecretKey   "nE1O01o9eDC1LRclU3GLuwD7QiB16BhruvDKfcIL"
 #define DHTPIN 13
 #define DHTTYPE DHT22
+#define id "a06e71b81f68d1258833b943b564257b1579bafe88322c107af7b9a70d7c3ad4"
 DHT dht(DHTPIN,DHTTYPE);
  float temp;
 float Hum;
@@ -85,23 +85,14 @@ Serial.println(" c");
 Serial.print("Humidity=  ");
 Serial.print(Hum);
 Serial.println(" %");
-count ++;
-if(count==50){
-digitalWrite(RELAY,HIGH);
-state = true;
-Firebase.setBool(firebaseData,"state",state);
- Serial.println("pump is on");
-delay(10111);
-count = 0; 
-}
-else{
-digitalWrite(RELAY,LOW);
-state = false;
-Serial.println("pump is off");
-  Firebase.setBool(firebaseData,"state",state);
-  Firebase.setInt(firebaseData,"count",count);
-  Firebase.setFloat(firebaseData, "TEMPERATURE", temp);
-  Firebase.setFloat(firebaseData, "HUMIDITY", Hum);
+
+
+
+  
+  Firebase.setInt(firebaseData,"site units/"+id+"/count",count);
+  Firebase.setFloat(firebaseData,"site units/"+id+"/TEMPERATURE", temp);
+  Firebase.setFloat(firebaseData, "site units/"+id+"HUMIDITY", Hum);
+  Firebase.setInt(firebaseData,"site units/"+id+"moisture",moisture)
    delay(1000);}
 
 
