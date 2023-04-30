@@ -89,10 +89,10 @@ Serial.println(" %");
 
 
   
-  Firebase.setInt(firebaseData,"site units/"+id+"/count",count);
-  Firebase.setFloat(firebaseData,"site units/"+id+"/TEMPERATURE", temp);
-  Firebase.setFloat(firebaseData, "site units/"+id+"HUMIDITY", Hum);
-  Firebase.setInt(firebaseData,"site units/"+id+"moisture",moisture)
+  Firebase.setInt(firebaseData,"site-units/"+id+"/count",count);
+  Firebase.setFloat(firebaseData,"site-units/"+id+"/TEMPERATURE", temp);
+  Firebase.setFloat(firebaseData, "site-units/"+id+"HUMIDITY", Hum);
+  Firebase.setInt(firebaseData,"site-units/"+id+"moisture",moisture)
    delay(1000);}
 
 
