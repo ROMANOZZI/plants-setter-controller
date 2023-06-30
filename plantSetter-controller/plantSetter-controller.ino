@@ -61,7 +61,7 @@ void loop() {
   valueM= analogRead(sensorM);
   moisture = valueM;
   Serial.print(moisture);
-  Serial.println("%");
+  
    
   if(moisture <750)
   {
@@ -83,9 +83,67 @@ void loop() {
   Serial.print("Humidity=  ");
   Serial.print(Hum);
   Serial.println(" %");
+bool flag = Firebase.getString(firebaseData,"site-units/"+id+"/state" );
 
+if (flag ){
+  String state = firebaseData.stringData();
+} 
   Firebase.setFloat(firebaseData,"site-units/"+id+"/TEMPERATURE", temp);
   Firebase.setFloat(firebaseData, "site-units/"+id+"/HUMIDITY", Hum);
   Firebase.setInt(firebaseData,"site-units/"+id+"/moisture",moisture);
+
+
+   String firebaseState ="";
+  if (Firebase.getString(firebaseData, "site-units/"+id+"/state")) {
+   firebaseState = firebaseData.stringData();}
+
+    int firebaseSize = Firebase.getInt(firebaseData, "site-units/"+id+"/Size");
+
+    int N = Firebase.getInt(firebaseData,"site-units/"+id+"/N");
+        
+    int P = Firebase.getInt(firebaseData,"site-units/"+id+"/P");
+         
+    int K = Firebase.getInt(firebaseData,"site-units/"+id+"/K");
+         
+         
+  if (firebaseState == "i") {
+    Firebase.setInt(firebaseData,"site-units/"+id+"/Size", 500);
+    Firebase.setString(firebaseData,"site-units/"+id+"/state","n");
+      
+  } else if (firebaseState == "n") {
+    digitalWrite(RELAY1, HIGH);
+  float delayTimeN  = (N/100)*0.04*1.56*firebaseSize*1000;
+  delay(delayTimeN);
+  digitalWrite(RELAY1, LOW);
+  Firebase.setString(firebaseData,  "site-units/"+id+"/state","p");
+
+  } else if (firebaseState == "p") {
+    digitalWrite(RELAY2, HIGH);
+  int delayTimeP  = (P/100)*0.04*1.56*firebaseSize*1000;
+  delay(delayTimeP);
+  digitalWrite(RELAY2, LOW);
+  Firebase.setString(firebaseData,  "site-units/"+id+"/state","k");
+
+  } else if (firebaseState == "k") {
+    digitalWrite(RELAY3, HIGH);
+  int delayTimeK  = (K/100)*0.04*1.56*firebaseSize*1000;
+  delay(delayTimeK);
+  digitalWrite(RELAY3, LOW);
+  Firebase.setString(firebaseData,"site-units/"+id+"/state", "w");
+
+  } else if (firebaseState == "w") {
+    digitalWrite(RELAY4, HIGH);
+      int firebaseSize = Firebase.getInt(firebaseData,"site-units/"+id+"/Size");
+      int delayTimeW = (firebaseSize*0.97) * 14.55;
+      delay(delayTimeW);
+      digitalWrite(RELAY4, LOW);
+      Firebase.setString(firebaseData,"site-units/"+id+"/state", "d");
+
+    
+  } else if (firebaseState == "d") {
+   /* int D = Firebase.getInt(firebaseData, "D");
+      D = (D / 100) * (20 / firebaseSize);*/
+      Firebase.setInt(firebaseData,"site-units/"+id+"/Size", 200);
+  }
   delay(1000);
 }
