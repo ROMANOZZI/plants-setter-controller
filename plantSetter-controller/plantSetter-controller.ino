@@ -6,10 +6,14 @@
 const String ssid="DEAD";
 const String password ="M24680zb";
 const String id= "a06e71b81f68d1258833b943b564257b1579bafe88322c107af7b9a70d7c3ad4" ;
-int RELAY1 =5;  // num of pin 
-int RELAY2 =4;
-int RELAY3 =14;
-int RELAY4 =12;
+int Rw =5;  // num of pin 
+int Rn =4;
+int Rk =14;
+int Rp =12;
+int N;
+int P;
+int K ;
+int firebaseSize ;
 
 int valueM= 0, moisture=0;
 
@@ -49,40 +53,31 @@ void setup()
   Firebase.reconnectWiFi(true);
   Serial.println("------------------------------------");
   Serial.println("Connected...");
-  pinMode(RELAY1, OUTPUT);
-  pinMode(RELAY2, OUTPUT);
-  pinMode(RELAY3, OUTPUT);
-  pinMode(RELAY4, OUTPUT);
+  pinMode(Rw, OUTPUT);
+  pinMode(Rn, OUTPUT);
+  pinMode(Rp, OUTPUT);
+  pinMode(Rk, OUTPUT);
+  digitalWrite(Rw,HIGH);
+  digitalWrite(Rn,HIGH);
+  digitalWrite(Rp,HIGH);
+  digitalWrite(Rk,HIGH);  
+
+  
   delay(500);
 }
 
 void loop() {
-  Serial.print("MOISTURE LEVEL : ");
+  
   valueM= analogRead(sensorM);
   moisture = valueM;
-  Serial.print(moisture);
+ 
   
    
-  if(moisture <750)
-  {
-    Serial.println("The Soil is Dry");
-  }
-  else if ( moisture <500)
-  {
-    Serial.println("THE SOIL IS WET.");
-  }
-  else{
-    Serial.println("THE SOIL  SHOULD BE WATERED");
-  }
+
      
   temp = dht.readTemperature();
   Hum=dht.readHumidity();
-  Serial.print("Temprature=  ");
-  Serial.print(temp);
-  Serial.println(" c");
-  Serial.print("Humidity=  ");
-  Serial.print(Hum);
-  Serial.println(" %");
+
 bool flag = Firebase.getString(firebaseData,"site-units/"+id+"/state" );
 
 if (flag ){
@@ -97,50 +92,80 @@ if (flag ){
   if (Firebase.getString(firebaseData, "site-units/"+id+"/state")) {
    firebaseState = firebaseData.stringData();}
 
-    int firebaseSize = Firebase.getInt(firebaseData, "site-units/"+id+"/Size");
+    bool SizeFlag = Firebase.getInt(firebaseData, "site-units/"+id+"/Size");
+    if (SizeFlag){
+      firebaseSize=firebaseData.intData();
+    }
 
-    int N = Firebase.getInt(firebaseData,"site-units/"+id+"/N");
+    bool Nflag = Firebase.getFloat(firebaseData,"site-units/"+id+"/N");
+    if(Nflag){
+       N=firebaseData.intData();
+    }
+
         
-    int P = Firebase.getInt(firebaseData,"site-units/"+id+"/P");
+    bool Pflag = Firebase.getInt(firebaseData,"site-units/"+id+"/P");
+    if (Pflag) {
+      P=firebaseData.intData();
+    }
          
-    int K = Firebase.getInt(firebaseData,"site-units/"+id+"/K");
-         
-         
+    bool Kflag = Firebase.getInt(firebaseData,"site-units/"+id+"/K");
+    if(Kflag){
+      K=firebaseData.intData();
+    }
+    Serial.print("Size   ");
+    Serial.println(firebaseSize);
+  
   if (firebaseState == "i") {
     Firebase.setInt(firebaseData,"site-units/"+id+"/Size", 500);
     Firebase.setString(firebaseData,"site-units/"+id+"/state","n");
       
   } else if (firebaseState == "n") {
-    digitalWrite(RELAY1, HIGH);
+  digitalWrite(Rn,LOW);
   float delayTimeN  = (N/100)*0.04*1.56*firebaseSize*1000;
+  Serial.print("Nitrogen");
+ 
+  Serial.println(delayTimeN);
   delay(delayTimeN);
-  digitalWrite(RELAY1, LOW);
+  digitalWrite(Rn,HIGH);
+
   Firebase.setString(firebaseData,  "site-units/"+id+"/state","p");
 
   } else if (firebaseState == "p") {
-    digitalWrite(RELAY2, HIGH);
+  digitalWrite(Rp,LOW);  
   int delayTimeP  = (P/100)*0.04*1.56*firebaseSize*1000;
+  Serial.print("phosphrus");
+
+  Serial.println(delayTimeP);
   delay(delayTimeP);
-  digitalWrite(RELAY2, LOW);
+  digitalWrite(Rp,HIGH);
+ 
   Firebase.setString(firebaseData,  "site-units/"+id+"/state","k");
 
   } else if (firebaseState == "k") {
-    digitalWrite(RELAY3, HIGH);
+  digitalWrite(Rk,LOW);
   int delayTimeK  = (K/100)*0.04*1.56*firebaseSize*1000;
+  Serial.print("Potasuim");
+ 
+  Serial.println(delayTimeK);
   delay(delayTimeK);
-  digitalWrite(RELAY3, LOW);
+  digitalWrite(Rk,HIGH);
   Firebase.setString(firebaseData,"site-units/"+id+"/state", "w");
 
   } else if (firebaseState == "w") {
-    digitalWrite(RELAY4, HIGH);
-      int firebaseSize = Firebase.getInt(firebaseData,"site-units/"+id+"/Size");
-      int delayTimeW = (firebaseSize*0.97) * 14.55;
+      
+      
+      int delayTimeW = (firebaseSize*0.97) * 14.55*1000;
+      digitalWrite(Rw,LOW);
+      Serial.print("Water   ");
+      Serial.println(delayTimeW);
+      
       delay(delayTimeW);
-      digitalWrite(RELAY4, LOW);
+      digitalWrite(Rw,HIGH);
+     
       Firebase.setString(firebaseData,"site-units/"+id+"/state", "d");
 
     
-  } else if (firebaseState == "d") {
+  } else {
    /* int D = Firebase.getInt(firebaseData, "D");
       D = (D / 100) * (20 / firebaseSize);*/
       Firebase.setInt(firebaseData,"site-units/"+id+"/Size", 200);
