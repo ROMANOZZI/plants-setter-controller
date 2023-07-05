@@ -112,41 +112,34 @@ if (flag ){
     if(Kflag){
       K=firebaseData.intData();
     }
-    Serial.print("Size   ");
-    Serial.println(firebaseSize);
-  
   if (firebaseState == "i") {
     Firebase.setInt(firebaseData,"site-units/"+id+"/Size", 500);
     Firebase.setString(firebaseData,"site-units/"+id+"/state","n");
       
   } else if (firebaseState == "n") {
-  digitalWrite(Rn,LOW);
-  float delayTimeN  = (N/100)*0.04*1.56*firebaseSize*1000;
-  Serial.print("Nitrogen");
- 
+  int delayTimeN  = N*0.624*firebaseSize;
+  Serial.print("n   ");
   Serial.println(delayTimeN);
+  digitalWrite(Rn,LOW);
   delay(delayTimeN);
   digitalWrite(Rn,HIGH);
 
   Firebase.setString(firebaseData,  "site-units/"+id+"/state","p");
 
   } else if (firebaseState == "p") {
-  digitalWrite(Rp,LOW);  
-  int delayTimeP  = (P/100)*0.04*1.56*firebaseSize*1000;
-  Serial.print("phosphrus");
-
+  int delayTimeP  = P*firebaseSize*0.624;
+  Serial.print("p   ");
   Serial.println(delayTimeP);
+  digitalWrite(Rp,LOW);  
   delay(delayTimeP);
   digitalWrite(Rp,HIGH);
- 
   Firebase.setString(firebaseData,  "site-units/"+id+"/state","k");
 
   } else if (firebaseState == "k") {
-  digitalWrite(Rk,LOW);
-  int delayTimeK  = (K/100)*0.04*1.56*firebaseSize*1000;
-  Serial.print("Potasuim");
- 
+  int delayTimeK  = K*firebaseSize*0.624;
+  Serial.print("k   ");
   Serial.println(delayTimeK);
+  digitalWrite(Rk,LOW);
   delay(delayTimeK);
   digitalWrite(Rk,HIGH);
   Firebase.setString(firebaseData,"site-units/"+id+"/state", "w");
@@ -154,7 +147,7 @@ if (flag ){
   } else if (firebaseState == "w") {
       
       
-      int delayTimeW = (firebaseSize*0.97) * 14.55*1000;
+      int delayTimeW = (firebaseSize*0.97) * 14.55;
       digitalWrite(Rw,LOW);
       Serial.print("Water   ");
       Serial.println(delayTimeW);
